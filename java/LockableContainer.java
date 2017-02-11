@@ -1,0 +1,55 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package doublex.lib.lockableContainers;
+
+import doublex.lib.locks.Locks;
+
+/**
+ *
+ * @author kenneth.lau
+ * @param <C>
+ * @param <K>
+ */
+public final class LockableContainer<C, K> implements IContainable<C>  {
+
+    public final Locks<K> mLocks = new Locks<>();
+
+    private C mContents = null;
+
+    @Override
+    public final void tryPutContents(final C contents) {
+        if (canPutContents()) putContents(contents);
+    }
+
+    @Override
+    public final C tryTakeContents() {
+        if (!canTakeContents()) return null;
+        final C contents = mContents;
+        clearContents();
+        return contents;
+    }
+
+    private boolean canPutContents() {
+        return !mLocks.isLocked() && isEmpty();
+    }
+
+    private void putContents(final C contents) {
+        mContents = contents;
+    }
+
+    private boolean canTakeContents() {
+        return !mLocks.isLocked() && !isEmpty();
+    }
+
+    private boolean isEmpty() {
+        return mContents == null;
+    };
+
+    private void clearContents() {
+        mContents = null;
+    }
+
+};
