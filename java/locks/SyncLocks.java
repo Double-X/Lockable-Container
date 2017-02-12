@@ -10,7 +10,7 @@ package doublex.lib.locks;
  * @author DoubleX
  * @param <K>
  */
-public final class SyncLocks<K> {
+public final class SyncLocks<K> implements ILocks<K> {
 
     private final Locks<K> mLocks;
 
@@ -18,19 +18,23 @@ public final class SyncLocks<K> {
         mLocks = locks;
     }
 
+    @Override
     public final ILockable<K> lock(final String key) {
         return mLocks.lock(key);
     }
 
+    @Override
     public final boolean isLocked() {
         return mLocks.isLocked();
     }
 
+    @Override
     public final synchronized void tryPutLock(
             final String key, final ILockable<K> lock) {
         mLocks.tryPutLock(key, lock);
     }
 
+    @Override
     public final synchronized ILockable<K> triedTakenLock(final String key) {
         return mLocks.triedTakenLock(key);
     }
