@@ -7,7 +7,7 @@ package doublex.lib.locks;
 
 /**
  *
- * @author kenneth.lau
+ * @author DoubleX
  * @param <K>
  */
 public final class CountedLock<K> implements ICountable, ILockable<K> {
