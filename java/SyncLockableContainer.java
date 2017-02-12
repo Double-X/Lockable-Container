@@ -9,24 +9,23 @@ package doublex.lib.lockableContainers;
  *
  * @author DoubleX
  * @param <C>
- * @param <K>
  */
-public final class SyncLockableContainer<C, K> implements IContainable<C> {
+public final class SyncLockableContainer<C> implements IContainable<C> {
 
-    private final IContainable<C> mLockableContainer;
+    private final IContainable<C> mContainable;
 
-    public SyncLockableContainer(final IContainable<C> lockableContainer) {
-        mLockableContainer = lockableContainer;
+    public SyncLockableContainer(final IContainable<C> containable) {
+        mContainable = containable;
     }
 
     @Override
     public final synchronized void tryPutContents(final C contents) {
-        mLockableContainer.tryPutContents(contents);
+        mContainable.tryPutContents(contents);
     }
 
     @Override
     public final synchronized C triedTakenContents() {
-        return mLockableContainer.triedTakenContents();
+        return mContainable.triedTakenContents();
     }
-    
+
 }
