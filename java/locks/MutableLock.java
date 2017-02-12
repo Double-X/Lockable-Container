@@ -7,7 +7,7 @@ package doublex.lib.locks;
 
 /**
  *
- * @author kenneth.lau
+ * @author DoubleX
  * @param <K>
  */
 public final class MutableLock<K> extends AbstractLock<K> implements 
@@ -21,13 +21,16 @@ public final class MutableLock<K> extends AbstractLock<K> implements
 
     @Override
     public final void tryChangeKey(final K oldKey, final K newKey) {
-        if (isLocked()) return;
-        if (isCorrectKey(oldKey)) changeKey(newKey);
+        if (canChangeKey(oldKey)) changeKey(newKey);
     }
 
     @Override
     final boolean isCorrectKey(final K key) {
         return mKey.equals(key);
+    }
+
+    private boolean canChangeKey(final K oldKey) {
+        return !isLocked() && isCorrectKey(oldKey);
     }
 
     private void changeKey(final K key) {
