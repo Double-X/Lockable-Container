@@ -7,7 +7,7 @@ package doublex.lib.lockableContainers;
 
 /**
  *
- * @author kenneth.lau
+ * @author DoubleX
  * @param <C>
  * @param <K>
  */
@@ -27,9 +27,9 @@ public final class UnitTestedLockableContainer<C, K> {
         mLockableContainer.tryPutContents(contents);
     }
 
-    public final C tryTakeContents() {
-        final C contents = mLockableContainer.tryTakeContents();
-        System.out.println("UnitTestedLockableContainer tryTakeContents");
+    public final C triedTakenContents() {
+        final C contents = mLockableContainer.triedTakenContents();
+        System.out.println("UnitTestedLockableContainer triedTakenContents");
         if (mLockableContainer.mLocks.isLocked() && contents != null) {
             System.out.println("Failed! Actual value: " + contents);
         } else {
