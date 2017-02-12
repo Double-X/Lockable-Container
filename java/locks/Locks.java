@@ -13,25 +13,29 @@ import java.util.LinkedHashMap;
  * @author DoubleX
  * @param <K>
  */
-public final class Locks<K> {
+public final class Locks<K> implements ILocks<K> {
 
     private final ILockable<K> NULL_LOCK = new NullLock<>();
 
     private final AbstractMap<String, ILockable<K>> mLocks = 
             new LinkedHashMap<>();
 
+    @Override
     public final ILockable<K> lock(final String key) {
         return mLocks.containsKey(key) ? mLocks.get(key) : NULL_LOCK;
     }
 
+    @Override
     public final boolean isLocked() {
         return mLocks.values().stream().anyMatch((lock) -> (lock.isLocked()));
     }
 
+    @Override
     public final void tryPutLock(final String key, final ILockable<K> lock) {
         if (canPutLock(key, lock)) putLock(key, lock);
     }
 
+    @Override
     public final ILockable<K> triedTakenLock(final String key) {
         return (canTakeLock(key)) ? takenLock(key) : NULL_LOCK;
     }
@@ -49,7 +53,7 @@ public final class Locks<K> {
     }
 
     private ILockable<K> takenLock(final String key) {
-        final ILockable<K> lock = mLocks.get(key);
+        final ILockable<K> lock = lock(key);
         mLocks.remove(key);
         return lock;
     }
