@@ -15,8 +15,7 @@ import doublex.lib.locks.Locks;
  */
 public final class LockableContainer<C, K> implements IContainable<C>  {
 
-    public final Locks<K> mLocks = new Locks<>();
-
+    private final Locks<K> mLocks = new Locks<>();
     private C mContents = null;
 
     @Override
@@ -27,6 +26,10 @@ public final class LockableContainer<C, K> implements IContainable<C>  {
     @Override
     public final C triedTakenContents() {
         return canTakeContents() ? takenContents() : null;
+    }
+
+    public final Locks<K> locks() {
+        return mLocks;
     }
 
     private boolean canPutContents() {
