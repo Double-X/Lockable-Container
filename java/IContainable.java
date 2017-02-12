@@ -7,13 +7,13 @@ package doublex.lib.lockableContainers;
 
 /**
  *
- * @author kenneth.lau
+ * @author DoubleX
  * @param <C>
  */
 public interface IContainable<C> {
 
     void tryPutContents(final C contents);
 
-    C tryTakeContents();
+    C triedTakenContents();
 
 };
