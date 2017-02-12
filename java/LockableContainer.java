@@ -9,7 +9,7 @@ import doublex.lib.locks.Locks;
 
 /**
  *
- * @author kenneth.lau
+ * @author DoubleX
  * @param <C>
  * @param <K>
  */
@@ -25,11 +25,9 @@ public final class LockableContainer<C, K> implements IContainable<C>  {
     }
 
     @Override
-    public final C tryTakeContents() {
+    public final C triedTakenContents() {
         if (!canTakeContents()) return null;
-        final C contents = mContents;
-        clearContents();
-        return contents;
+        return takenContents();
     }
 
     private boolean canPutContents() {
@@ -47,6 +45,12 @@ public final class LockableContainer<C, K> implements IContainable<C>  {
     private boolean isEmpty() {
         return mContents == null;
     };
+
+    private C takenContents() {
+        final C contents = mContents;
+        clearContents();
+        return contents;
+    }
 
     private void clearContents() {
         mContents = null;
