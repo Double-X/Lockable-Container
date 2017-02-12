@@ -5,7 +5,7 @@
  */
 package doublex.lib.lockableContainers;
 
-import doublex.lib.locks.Locks;
+import doublex.lib.locks.ILocks;
 
 /**
  *
@@ -15,8 +15,12 @@ import doublex.lib.locks.Locks;
  */
 public final class LockableContainer<C, K> implements IContainable<C>  {
 
-    private final Locks<K> mLocks = new Locks<>();
+    public final ILocks<K> mLocks;
     private C mContents = null;
+
+    public LockableContainer(final ILocks<K> locks) {
+        mLocks = locks;
+    };
 
     @Override
     public final void tryPutContents(final C contents) {
@@ -26,10 +30,6 @@ public final class LockableContainer<C, K> implements IContainable<C>  {
     @Override
     public final C triedTakenContents() {
         return canTakeContents() ? takenContents() : null;
-    }
-
-    public final Locks<K> locks() {
-        return mLocks;
     }
 
     private boolean canPutContents() {
