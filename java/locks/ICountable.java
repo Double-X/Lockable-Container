@@ -7,7 +7,7 @@ package doublex.lib.locks;
 
 /**
  *
- * @author kenneth.lau
+ * @author DoubleX
  */
 public interface ICountable {
 
