@@ -26,8 +26,7 @@ public final class LockableContainer<C, K> implements IContainable<C>  {
 
     @Override
     public final C triedTakenContents() {
-        if (!canTakeContents()) return null;
-        return takenContents();
+        return canTakeContents() ? takenContents() : null;
     }
 
     private boolean canPutContents() {
