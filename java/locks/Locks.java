@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 
 /**
  *
- * @author kenneth.lau
+ * @author DoubleX
  * @param <K>
  */
 public final class Locks<K> {
