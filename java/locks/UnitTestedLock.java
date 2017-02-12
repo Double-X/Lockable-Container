@@ -7,7 +7,7 @@ package doublex.lib.locks;
 
 /**
  *
- * @author kenneth.lau
+ * @author DoubleX
  * @param <K>
  */
 public class UnitTestedLock<K> implements ILockable<K> {
