@@ -7,7 +7,7 @@ package doublex.lib.locks;
 
 /**
  *
- * @author kenneth.lau
+ * @author DoubleX
  * @param <K>
  */
 public abstract class AbstractLock<K> implements ILockable<K> {
