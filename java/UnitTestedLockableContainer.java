@@ -5,13 +5,19 @@
  */
 package doublex.lib.lockableContainers;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author DoubleX
  * @param <C>
  * @param <K>
  */
-public final class UnitTestedLockableContainer<C, K> {
+public final class UnitTestedLockableContainer<C, K> implements IContainable<C> {
+
+    private static final Logger LOG = 
+            Logger.getLogger(UnitTestedLockableContainer.class.getName());
 
     private final LockableContainer<C, K> mLockableContainer;
 
@@ -20,23 +26,26 @@ public final class UnitTestedLockableContainer<C, K> {
         mLockableContainer = lockableContainer;
     }
 
-    public final void tryPutContents(final C contents) {
-        System.out.println(
-                "UnitTestedLockableContainer tryPutContents contents: " + 
-                        contents);
+    @Override
+    public void tryPutContents(final C contents) {
+        unitTestTryPutContents(contents);
         mLockableContainer.tryPutContents(contents);
     }
 
-    public final C triedTakenContents() {
+    @Override
+    public C triedTakenContents() {
         final C contents = mLockableContainer.triedTakenContents();
-        System.out.println("UnitTestedLockableContainer triedTakenContents");
-        if (mLockableContainer.mLocks.isLocked() && contents != null) {
-            System.out.println("Failed! Actual value: " + contents);
-        } else {
-            System.out.println(
-                    "At least nothing can be taken from a locked container!");
-        }
+        unitTestTriedTakenContents(contents);
         return contents;
     }
 
+    private void unitTestTryPutContents(final C contents) {
+        LOG.log(Level.INFO, "UnitTestedLockableContainer tryPutContents");
+        LOG.log(Level.INFO, "contents: {0}", contents);
+    }
+
+    private void unitTestTriedTakenContents(final C contents) {
+        LOG.log(Level.INFO, "UnitTestedLockableContainer triedTakenContents");
+        LOG.log(Level.INFO, "contents: {0}", contents);
+    }
 }
