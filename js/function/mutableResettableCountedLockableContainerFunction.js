@@ -1,5 +1,5 @@
-function ResettableCountedLockableContainerFunction(LockableContainer, ERRBACK, 
-        MAX_KEY_MISMATCH_COUNT, IS_RESETTABLE, IS_RESETTING) {
+function MutableResettableCountedLockableContainerFunction(LockableContainer, 
+        ERRBACK, MAX_KEY_MISMATCH_COUNT, IS_RESETTABLE, IS_RESETTING) {
 
     'use strict';
 
