@@ -117,11 +117,19 @@ function LockableContainerIntegrationTest() {
         memoryTest.push(
                 LockableContainerFunction(_callback2, _errback2, _key2));
         //
-        // Total: Roughly 225MB for 100,000 times
-        memoryTest.push(ResettableCountedLockableContainerFunction(
+        // Total: Roughly 269MB for 100,000 times
+        memoryTest.push(ImmutableResettableCountedLockableContainerFunction(
                 LockableContainerFunction(_callback1, _errback1, _key1), 
                 _errback1, _maxKeyMismatchCount1, true, false));
-        memoryTest.push(ResettableCountedLockableContainerFunction(
+        memoryTest.push(ImmutableResettableCountedLockableContainerFunction(
+                LockableContainerFunction(_callback2, _errback2, _key2), 
+                _errback2, _maxKeyMismatchCount2, false, true));
+        //
+        // Total: Roughly 225MB for 100,000 times
+        memoryTest.push(MutableResettableCountedLockableContainerFunction(
+                LockableContainerFunction(_callback1, _errback1, _key1), 
+                _errback1, _maxKeyMismatchCount1, true, false));
+        memoryTest.push(MutableResettableCountedLockableContainerFunction(
                 LockableContainerFunction(_callback2, _errback2, _key2), 
                 _errback2, _maxKeyMismatchCount2, false, true));
         //
@@ -212,13 +220,21 @@ function LockableContainerIntegrationTest() {
         LockableContainerFunction(_callback1, _errback1, _key1);
         LockableContainerFunction(_callback2, _errback2, _key2);
         //
+        // Roughly 11 seconds for 10,000,000 times
+        ImmutableResettableCountedLockableContainerFunction(
+                LockableContainerFunction(_callback1, _errback1, _key1), 
+                _errback1, _maxKeyMismatchCount1, isResettable, isResetting);
+        ImmutableResettableCountedLockableContainerFunction(
+                LockableContainerFunction(_callback2, _errback2, _key2), 
+                _errback2, _maxKeyMismatchCount2, isResettable, isResetting);
+        //
         // Roughly 16 seconds for 1,000,000 times
-        ResettableCountedLockableContainerFunction(LockableContainerFunction(
-                _callback1, _errback1, _key1), _errback1, 
-                _maxKeyMismatchCount1, isResettable, isResetting);
-        ResettableCountedLockableContainerFunction(LockableContainerFunction(
-                _callback2, _errback2, _key2), _errback2, 
-                _maxKeyMismatchCount2, isResettable, isResetting);
+        MutableResettableCountedLockableContainerFunction(
+                LockableContainerFunction(_callback1, _errback1, _key1), 
+                _errback1, _maxKeyMismatchCount1, isResettable, isResetting);
+        MutableResettableCountedLockableContainerFunction(
+                LockableContainerFunction(_callback2, _errback2, _key2), 
+                _errback2, _maxKeyMismatchCount2, isResettable, isResetting);
         //
 
         // Roughly 16 seconds for 1,000,000 times
@@ -249,12 +265,10 @@ function LockableContainerIntegrationTest() {
 
     console.info('Pre correctness test');
 
-    var _lockableContainer1 = ResettableCountedLockableContainerFunction(
-            LockableContainerFunction(_callback1, _errback1, _key1), _errback1, 
-            _maxKeyMismatchCount1, isResettable, isResetting);
-    var _lockableContainer2 = ResettableCountedLockableContainerFunction(
-            LockableContainerFunction(_callback2, _errback2, _key2), _errback2, 
-            _maxKeyMismatchCount2, isResettable, isResetting);
+    var _lockableContainer1 = LockableContainerKiss(_callback1, _errback1, 
+            _key1, _maxKeyMismatchCount1, isResettable, isResetting);
+    var _lockableContainer2 = LockableContainerKiss(_callback2, _errback2, 
+            _key2, _maxKeyMismatchCount2, isResettable, isResetting);
     /*
     var _lockableContainer1 = new ResettableCountedLockableContainerClass(
             _callback1, _errback1, _key1, _maxKeyMismatchCount1);
@@ -296,12 +310,24 @@ function LockableContainerIntegrationTest() {
     var _lockableContainer2 = _createdLockableContainerFactory(
             'ResettingCountedLockableContainer', _callback2, _errback2, _key2, 
             _maxKeyMismatchCount2);
-    var _lockableContainer1 = ResettableCountedLockableContainerFunction(
+    var _lockableContainer1 = 
+            ImmutableResettableCountedLockableContainerFunction(
             LockableContainerFunction(_callback1, _errback1, _key1), _errback1, 
             _maxKeyMismatchCount1, isResettable, isResetting);
-    var _lockableContainer2 = ResettableCountedLockableContainerFunction(
+    var _lockableContainer2 = 
+            ImmutableResettableCountedLockableContainerFunction(
             LockableContainerFunction(_callback2, _errback2, _key2), _errback2, 
             _maxKeyMismatchCount2, isResettable, isResetting);
+    var _lockableContainer1 = MutableResettableCountedLockableContainerFunction(
+            LockableContainerFunction(_callback1, _errback1, _key1), _errback1, 
+            _maxKeyMismatchCount1, isResettable, isResetting);
+    var _lockableContainer2 = MutableResettableCountedLockableContainerFunction(
+            LockableContainerFunction(_callback2, _errback2, _key2), _errback2, 
+            _maxKeyMismatchCount2, isResettable, isResetting);
+    var _lockableContainer1 = LockableContainerKiss(_callback1, _errback1, 
+            _key1, _maxKeyMismatchCount1, isResettable, isResetting);
+    var _lockableContainer2 = LockableContainerKiss(_callback2, _errback2, 
+            _key2, _maxKeyMismatchCount2, isResettable, isResetting);
     var _lockableContainer1 = new LockableContainerObject(
             'ResettableCountedLockableContainer', _callback1, _errback1, _key1, 
             _maxKeyMismatchCount1);
