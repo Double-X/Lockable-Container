@@ -26,7 +26,9 @@ public abstract class AbstractLock<K> implements ILockable<K> {
 
     @Override
     public final void tryUnlock(final K key) {
-        if (isCorrectKey(key)) unlock();
+        if (isCorrectKey(key)) {
+            unlock();
+        }
     }
 
     abstract boolean isCorrectKey(final K key);
