@@ -20,12 +20,14 @@ public final class MutableLock<K> extends AbstractLock<K> implements
     }
 
     @Override
-    public final void tryChangeKey(final K oldKey, final K newKey) {
-        if (canChangeKey(oldKey)) changeKey(newKey);
+    public void tryChangeKey(final K oldKey, final K newKey) {
+        if (canChangeKey(oldKey)) {
+            changeKey(newKey);
+        }
     }
 
     @Override
-    final boolean isCorrectKey(final K key) {
+    boolean isCorrectKey(final K key) {
         return mKey.equals(key);
     }
 
