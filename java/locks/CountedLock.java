@@ -12,49 +12,75 @@ package doublex.lib.locks;
  */
 public final class CountedLock<K> implements ICountable, ILockable<K> {
 
-    private final int mMaxKeyMismatchCount;
     private final ILockable<K> mLock;
 
-    private int mKeyMismatchCount = 0;
+    private int mKeyMismatchCount;
+    private int mMaxKeyMismatchCount;
 
     public CountedLock(final int maxKeyMismatchCount, final ILockable<K> lock) {
+        resetKeyMismatchCount();
         mMaxKeyMismatchCount = maxKeyMismatchCount;
         mLock = lock;
     }
 
     @Override
-    public final boolean isLocked() {
+    public boolean isLocked() {
         return mLock.isLocked();
     }
 
     @Override
-    public final void lock() {
+    public void lock() {
         mLock.lock();
     }
 
     @Override
-    public final void tryUnlock(final K key) {
-        if (isMaxKeyMismatchCountReached()) return;
+    public void tryUnlock(final K key) {
+        if (isReachMaxKeyMismatchCount()) {
+            return;
+        }
         mLock.tryUnlock(key);
-        if (isLocked()) addKeyMismatchCount();
+        if (isLocked()) {
+            addKeyMismatchCount();
+        }
     }
 
     @Override
-    public final void tryResetCount() {
-        if (!isLocked()) resetKeyMismatchCount();
-    }
-
-    @Override
-    public final int count() {
+    public int count() {
         return mKeyMismatchCount;
     }
 
-    private boolean isMaxKeyMismatchCountReached() {
+    @Override
+    public void tryChangeMaxCount(final int maxCount) {
+        if (canChangeMaxCount(maxCount)) {
+            changeMaxKeyMismatchCount(maxCount);
+        }
+    }
+
+    @Override
+    public void tryResetCount() {
+        if (!isLocked()) {
+            resetKeyMismatchCount();
+        }
+    }
+
+    private boolean isReachMaxKeyMismatchCount() {
         return count() >= mMaxKeyMismatchCount;
     }
 
     private void addKeyMismatchCount() {
         mKeyMismatchCount++;
+    }
+
+    private boolean canChangeMaxCount(final int maxCount) {
+        return !isLocked() && isExceedCurKeyMismatchCount(maxCount);
+    }
+
+    private boolean isExceedCurKeyMismatchCount(final int maxCount) {
+        return maxCount > count();
+    }
+
+    private void changeMaxKeyMismatchCount(final int maxCount) {
+        mMaxKeyMismatchCount = maxCount;
     }
 
     private void resetKeyMismatchCount() {
