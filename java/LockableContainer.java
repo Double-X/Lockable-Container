@@ -16,20 +16,28 @@ import doublex.lib.locks.ILocks;
 public final class LockableContainer<C, K> implements IContainable<C>  {
 
     public final ILocks<K> mLocks;
-    private C mContents = null;
 
-    public LockableContainer(final ILocks<K> locks) {
+    private final C mNullContents;
+
+    private C mContents;
+
+    public LockableContainer(
+            final ILocks<K> locks, final C contents, final C nullContents) {
         mLocks = locks;
+        mContents = contents;
+        mNullContents = nullContents;
     };
 
     @Override
-    public final void tryPutContents(final C contents) {
-        if (canPutContents()) putContents(contents);
+    public void tryPutContents(final C contents) {
+        if (canPutContents()) {
+            putContents(contents);
+        }
     }
 
     @Override
-    public final C triedTakenContents() {
-        return canTakeContents() ? takenContents() : null;
+    public C triedTakenContents() {
+        return canTakeContents() ? takenContents() : mNullContents;
     }
 
     private boolean canPutContents() {
@@ -45,17 +53,13 @@ public final class LockableContainer<C, K> implements IContainable<C>  {
     }
 
     private boolean isEmpty() {
-        return mContents == null;
+        return mContents == mNullContents;
     };
 
     private C takenContents() {
         final C contents = mContents;
-        clearContents();
+        putContents(mNullContents);
         return contents;
-    }
-
-    private void clearContents() {
-        mContents = null;
     }
 
 };
