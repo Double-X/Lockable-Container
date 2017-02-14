@@ -6,7 +6,6 @@
 package doublex.lib.locks;
 
 import java.util.AbstractMap;
-import java.util.LinkedHashMap;
 
 /**
  *
@@ -17,26 +16,31 @@ public final class Locks<K> implements ILocks<K> {
 
     private final ILockable<K> NULL_LOCK = new NullLock<>();
 
-    private final AbstractMap<String, ILockable<K>> mLocks = 
-            new LinkedHashMap<>();
+    private final AbstractMap<String, ILockable<K>> mLocks;
+
+    public Locks(final AbstractMap<String, ILockable<K>> locks) {
+        mLocks = locks;
+    }
 
     @Override
-    public final ILockable<K> lock(final String key) {
+    public ILockable<K> lock(final String key) {
         return mLocks.containsKey(key) ? mLocks.get(key) : NULL_LOCK;
     }
 
     @Override
-    public final boolean isLocked() {
+    public boolean isLocked() {
         return mLocks.values().stream().anyMatch((lock) -> (lock.isLocked()));
     }
 
     @Override
-    public final void tryPutLock(final String key, final ILockable<K> lock) {
-        if (canPutLock(key, lock)) putLock(key, lock);
+    public void tryPutLock(final String key, final ILockable<K> lock) {
+        if (canPutLock(key, lock)) {
+            putLock(key, lock);
+        }
     }
 
     @Override
-    public final ILockable<K> triedTakenLock(final String key) {
+    public ILockable<K> triedTakenLock(final String key) {
         return (canTakeLock(key)) ? takenLock(key) : NULL_LOCK;
     }
 
