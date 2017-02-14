@@ -11,8 +11,10 @@ package doublex.lib.locks;
  */
 public interface ICountable {
 
-    public void tryResetCount();
-
     public int count();
+
+    public void tryChangeMaxCount(final int maxCount);
+
+    public void tryResetCount();
 
 }
