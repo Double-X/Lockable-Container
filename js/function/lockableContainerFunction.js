@@ -1,4 +1,4 @@
-function LockableContainerFunction(CALLBACK, ERRBACK, KEY) {
+function LockableContainerFunction(KEY) {
 
     'use strict';
 
@@ -14,27 +14,26 @@ function LockableContainerFunction(CALLBACK, ERRBACK, KEY) {
 
     function lock() { _isLocked = true; };
 
-    function tryPutContents(contents) {
-        if (isLocked()) return ERRBACK(_MSG_LOCKED);
-        if (_hasNoContents()) return _putContents(contents);
-        ERRBACK(_MSG_HAS_CONTENTS);
+    function tryPutContents(contents, errback) {
+        if (isLocked()) return errback(_MSG_LOCKED);
+        _hasNoContents() ? _putContents(contents) : errback(_MSG_HAS_CONTENTS);
     };
 
-    function tryTakeContents() {
-        if (isLocked()) return ERRBACK(_MSG_LOCKED);
-        _hasNoContents() ? ERRBACK(_MSG_NO_CONTENTS) : _takeContents();
+    function tryTakeContents(callback, errback) {
+        if (isLocked()) return errback(_MSG_LOCKED);
+        _hasNoContents() ? errback(_MSG_NO_CONTENTS) : _takeContents(callback);
     };
 
-    function tryUnlock(key) {
-        _isCorrectKey(key) ? _unlock() : ERRBACK(_MSG_INCORRECT_KEY);
+    function tryUnlock(key, errback) {
+        _isCorrectKey(key) ? _unlock() : errback(_MSG_INCORRECT_KEY);
     };
 
     function _hasNoContents() { return _contents === _NULL_CONTENTS; };
 
     function _putContents(contents) { _contents = contents; };
 
-    function _takeContents() {
-        CALLBACK(_contents);
+    function _takeContents(callback) {
+        callback(_contents);
         _clearContents();
     };
 
