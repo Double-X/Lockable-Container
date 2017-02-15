@@ -3,7 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package doublex.lib.locks;
+package doublex.lib.locks.lock;
+
+import doublex.lib.locks.ILockable;
+import doublex.lib.locks.exceptions.KeyMismatchException;
 
 /**
  *
@@ -25,9 +28,11 @@ public abstract class AbstractLock<K> implements ILockable<K> {
     }
 
     @Override
-    public final void tryUnlock(final K key) {
+    public final void tryUnlock(final K key) throws KeyMismatchException {
         if (isCorrectKey(key)) {
             unlock();
+        } else {
+            throw new KeyMismatchException();
         }
     }
 
