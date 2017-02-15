@@ -3,18 +3,21 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package doublex.lib.locks;
+package doublex.lib.locks.lock;
+
+import doublex.lib.locks.ILockable;
+import doublex.lib.locks.exceptions.KeyMismatchException;
 
 /**
  *
  * @author DoubleX
  * @param <K>
  */
-public final class SyncCountedLock<K> implements ILockable<K> {
+public final class SyncLock<K> implements ILockable<K> {
 
-    private final CountedLock<K> mLock;
+    private final ILockable<K> mLock;
 
-    public SyncCountedLock(final CountedLock<K> lock) {
+    public SyncLock(final ILockable<K> lock) {
         mLock = lock;
     }
 
@@ -29,7 +32,7 @@ public final class SyncCountedLock<K> implements ILockable<K> {
     }
 
     @Override
-    public synchronized void tryUnlock(K key) {
+    public synchronized void tryUnlock(final K key) throws KeyMismatchException {
         mLock.tryUnlock(key);
     }
 
