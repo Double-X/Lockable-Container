@@ -1,5 +1,5 @@
 function MutableResettableCountedLockableContainerFunction(LockableContainer, 
-        ERRBACK, MAX_KEY_MISMATCH_COUNT, IS_RESETTABLE, IS_RESETTING) {
+        MAX_KEY_MISMATCH_COUNT, IS_RESETTABLE, IS_RESETTING) {
 
     'use strict';
 
@@ -10,22 +10,22 @@ function MutableResettableCountedLockableContainerFunction(LockableContainer,
     var _keyMismatchCount = 0;
 
     var originalTryUnlock = LockableContainer.tryUnlock;
-    LockableContainer.tryUnlock = function(key) {
-        if (!_hasReachedMaxKeyMismatchCount()) return _tryUnlock(key);
-        ERRBACK(_MSG_MAX_COUNT_REACHED);
+    LockableContainer.tryUnlock = function(key, errback) {
+        if (!_hasReachedMaxKeyMismatchCount()) return _tryUnlock(key, errback);
+        errback(_MSG_MAX_COUNT_REACHED);
     };
 
     function keyMismatchCount() { return _keyMismatchCount; };
 
-    function _tryUnlock(key) {
-        originalTryUnlock(key);
+    function _tryUnlock(key, errback) {
+        originalTryUnlock(key, errback);
         if (_isResettingKeyMismatchCount()) return _resetKeyMismatchCount();
-        if (LockableContainer.isLocked()) _onAddKeyMismatchCount();
+        if (LockableContainer.isLocked()) _onAddKeyMismatchCount(errback);
     };
 
-    function _onAddKeyMismatchCount() {
+    function _onAddKeyMismatchCount(errback) {
         _addKeyMismatchCount();
-        if (_hasReachedMaxKeyMismatchCount()) ERRBACK(_MSG_MAX_COUNT_REACHED);
+        if (_hasReachedMaxKeyMismatchCount()) errback(_MSG_MAX_COUNT_REACHED);
     }
 
     function _addKeyMismatchCount() { _keyMismatchCount++; };
@@ -51,8 +51,8 @@ function MutableResettableCountedLockableContainerFunction(LockableContainer,
 
     if (IS_RESETTABLE) {
 
-        function tryResetKeyMismatchCount() {
-            if (LockableContainer.isLocked()) return ERRBACK(_MSG_LOCKED);
+        function tryResetKeyMismatchCount(errback) {
+            if (LockableContainer.isLocked()) return errback(_MSG_LOCKED);
             _resetKeyMismatchCount();
         };
 
@@ -64,7 +64,7 @@ function MutableResettableCountedLockableContainerFunction(LockableContainer,
     if (IS_RUN_TEST_PER_CODE_CALL) {
 
         function _unitTestResetKeyMismatchCount() {
-            console.info('ResettableCountedLockableContainerFunction _unitTestResetKeyMismatchCount');
+            console.info('MutableResettableCountedLockableContainerFunction _unitTestResetKeyMismatchCount');
             if (keyMismatchCount() <= 0) return console.info('Passed!');
             console.info('Failed! Actual value: ' + keyMismatchCount());
         };
