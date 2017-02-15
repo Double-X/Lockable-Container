@@ -3,7 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package doublex.lib.locks;
+package doublex.lib.locks.lock;
+
+import doublex.lib.locks.IMutableLockable;
+import doublex.lib.locks.exceptions.KeyMismatchException;
 
 /**
  *
@@ -20,8 +23,10 @@ public final class MutableLock<K> extends AbstractLock<K> implements
     }
 
     @Override
-    public void tryChangeKey(final K oldKey, final K newKey) {
-        if (canChangeKey(oldKey)) {
+    public void tryChangeKey(final K oldKey, final K newKey) 
+            throws KeyMismatchException {
+        if (!isLocked()) {
+            checkCanChangeKey(oldKey);
             changeKey(newKey);
         }
     }
@@ -31,8 +36,10 @@ public final class MutableLock<K> extends AbstractLock<K> implements
         return mKey.equals(key);
     }
 
-    private boolean canChangeKey(final K oldKey) {
-        return !isLocked() && isCorrectKey(oldKey);
+    private void checkCanChangeKey(final K oldKey) throws KeyMismatchException {
+        if (!isCorrectKey(oldKey)) {
+            throw new KeyMismatchException();
+        }
     }
 
     private void changeKey(final K key) {
