@@ -13,9 +13,8 @@ function ResettableCountedLockableContainer() {
             ResettableCountedLockableContainer;
 
     ResettableCountedLockableContainer.prototype.tryResetKeyMismatchCount
-            = function() {
-        if (this.isLocked()) return this._ERRBACK(_MSG_LOCKED);
-        this._resetKeyMismatchCount();
+            = function(errback) {
+        this.isLocked() ? errback(_MSG_LOCKED) : this._resetKeyMismatchCount();
     };
 
 })(CountedLockableContainer.prototype);
