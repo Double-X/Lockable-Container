@@ -9,7 +9,7 @@ function LockableContainerObject() {
     var _NULL_CONTENTS = {};
     var _SUBCLASS_COUNTED_LOCKABLE_CONTAINER = [
         'CountedLockableContainer',
-        'ResetableCountedLockableContainer',
+        'ResettableCountedLockableContainer',
         'ResettingCountedLockableContainer'
     ];
 
@@ -25,8 +25,7 @@ function LockableContainerObject() {
     };
 
     function _lockableContainer() {
-        var args = arguments[0];
-        this._init(args[1], args[2], args[3]);
+        this._init(arguments[0][1]);
         return {
             isLocked: this.isLocked.bind(this),
             lock: this.lock.bind(this),
@@ -36,29 +35,25 @@ function LockableContainerObject() {
         };
     };
 
-    var CALLBACK, KEY;
+    var KEY;
 
     var _contents = _NULL_CONTENTS, _isLocked = false;
 
-    function _initReadonlys(callback, errback, key) {
-        CALLBACK = callback;
-        this._ERRBACK = errback;
-        KEY = key;
-    };
+    function _initReadonlys(key) { KEY = key; };
 
     function _hasNoContents() { return _contents === _NULL_CONTENTS; };
 
     function _putContents(contents) { _contents = contents; };
 
-    function _takeContents() {
-        CALLBACK(_contents);
+    function _takeContents(callback) {
+        callback(_contents);
         _clearContents.call(this);
     };
 
     function _clearContents() { _contents = _NULL_CONTENTS; };
 
-    this._init = function(callback, errback, key) {
-        _initReadonlys.call(this, callback, errback, key);
+    this._init = function(key) {
+        _initReadonlys.call(this, key);
         this._initCaches();
     };
 
@@ -66,21 +61,20 @@ function LockableContainerObject() {
 
     this.lock = function() { _isLocked = true; };
 
-    this.tryPutContents = function(contents) {
-        if (this.isLocked()) return this._ERRBACK(_MSG_LOCKED);
+    this.tryPutContents = function(contents, errback) {
+        if (this.isLocked()) return errback(_MSG_LOCKED);
         if (_hasNoContents.call(this)) return _putContents.call(this, contents);
-        this._ERRBACK(_MSG_HAS_CONTENTS);
+        errback(_MSG_HAS_CONTENTS);
     };
 
-    this.tryTakeContents = function() {
-        if (this.isLocked()) return this._ERRBACK(_MSG_LOCKED);
-        if (_hasNoContents.call(this)) return this._ERRBACK(_MSG_NO_CONTENTS);
-        _takeContents.call(this);
+    this.tryTakeContents = function(callback, errback) {
+        if (this.isLocked()) return errback(_MSG_LOCKED);
+        if (_hasNoContents.call(this)) return errback(_MSG_NO_CONTENTS);
+        _takeContents.call(this, callback);
     };
 
-    this.tryUnlock = function(key) {
-        if (this._isCorrectKey(key)) return this._unlock();
-        this._ERRBACK(_MSG_INCORRECT_KEY);
+    this.tryUnlock = function(key, errback) {
+        this._isCorrectKey(key) ? this._unlock() : errback(_MSG_INCORRECT_KEY);
     };
 
     this._initCaches = function() {
