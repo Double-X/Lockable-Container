@@ -1,4 +1,4 @@
-function LockableContainerClass(CALLBACK, ERRBACK, KEY) {
+function LockableContainerClass(KEY) {
 
     'use strict';
 
@@ -18,8 +18,8 @@ function LockableContainerClass(CALLBACK, ERRBACK, KEY) {
 
     function _putContents(contents) { _contents = contents; };
 
-    function _takeContents() {
-        CALLBACK(_contents);
+    function _takeContents(callback) {
+        callback(_contents);
         _clearContents();
     };
 
@@ -29,20 +29,20 @@ function LockableContainerClass(CALLBACK, ERRBACK, KEY) {
 
     this.lock = function() { _isLocked = true; };
 
-    this.tryPutContents = function(contents) {
-        if (this.isLocked()) return ERRBACK(_MSG_LOCKED);
+    this.tryPutContents = function(contents, errback) {
+        if (this.isLocked()) return errback(_MSG_LOCKED);
         if (_hasNoContents()) return _putContents(contents);
-        ERRBACK(_MSG_HAS_CONTENTS);
+        errback(_MSG_HAS_CONTENTS);
     };
 
-    this.tryTakeContents = function() {
-        if (this.isLocked()) return ERRBACK(_MSG_LOCKED);
-        _hasNoContents() ? ERRBACK(_MSG_NO_CONTENTS) : _takeContents();
+    this.tryTakeContents = function(callback, errback) {
+        if (this.isLocked()) return errback(_MSG_LOCKED);
+        _hasNoContents() ? errback(_MSG_NO_CONTENTS) : _takeContents(callback);
     };
 
-    this.tryUnlock = function(key) {
+    this.tryUnlock = function(key, errback) {
         if (_protected.isCorrectKey(key)) return _protected.unlock();
-        ERRBACK(_MSG_INCORRECT_KEY);
+        errback(_MSG_INCORRECT_KEY);
     };
 
     LockableContainerUnitTest(this);
