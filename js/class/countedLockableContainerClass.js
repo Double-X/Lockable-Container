@@ -1,12 +1,11 @@
-function CountedLockableContainerClass(
-        CALLBACK, ERRBACK, KEY, MAX_KEY_MISMATCH_COUNT) {
+function CountedLockableContainerClass(KEY, MAX_KEY_MISMATCH_COUNT) {
 
     'use strict';
 
     var _MSG_MAX_COUNT_REACHED = 
             'The maximum amount of tolerable key mismatches are reached';
 
-    var _protected = LockableContainerClass.call(this, CALLBACK, ERRBACK, KEY);
+    var _protected = LockableContainerClass.call(this, KEY);
     _protected.keyMismatchCount = 0;
 
     function _addKeyMismatchCount() { _protected.keyMismatchCount++; };
@@ -15,22 +14,22 @@ function CountedLockableContainerClass(
         return this.keyMismatchCount() >= MAX_KEY_MISMATCH_COUNT;
     };
 
+    function _tryUnlock(key, errback) {
+        if (!_protected.isCorrectKey(key)) _addKeyMismatchCount();
+        originalTryUnlock.call(this, key, errback);
+        if (!_hasReachedMaxKeyMismatchCount.call(this)) return;
+        errback(_MSG_MAX_COUNT_REACHED);
+    };
+
     var originalTryUnlock = this.tryUnlock;
-    this.tryUnlock = function(key) {
+    this.tryUnlock = function(key, errback) {
         if (_hasReachedMaxKeyMismatchCount.call(this)) {
-            return ERRBACK(_MSG_MAX_COUNT_REACHED);
+            return errback(_MSG_MAX_COUNT_REACHED);
         }
-        _tryUnlock.call(this, key);
+        _tryUnlock.call(this, key, errback);
     };
 
     this.keyMismatchCount = function() { return _protected.keyMismatchCount; };
-
-    function _tryUnlock(key) {
-        if (!_protected.isCorrectKey(key)) _addKeyMismatchCount();
-        originalTryUnlock.call(this, key);
-        if (!_hasReachedMaxKeyMismatchCount.call(this)) return;
-        ERRBACK(_MSG_MAX_COUNT_REACHED);
-    };
 
     CountedLockableContainerUnitTest(this);
 
