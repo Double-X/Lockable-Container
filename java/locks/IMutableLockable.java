@@ -5,6 +5,8 @@
  */
 package doublex.lib.locks;
 
+import doublex.lib.locks.exceptions.KeyMismatchException;
+
 /**
  *
  * @author DoubleX
@@ -12,6 +14,7 @@ package doublex.lib.locks;
  */
 public interface IMutableLockable<K> extends ILockable<K> {
 
-    void tryChangeKey(final K oldKey, final K newKey);
+    void tryChangeKey(final K oldKey, final K newKey) 
+            throws KeyMismatchException;
 
 };
