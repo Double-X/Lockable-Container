@@ -9,7 +9,7 @@ function LockableContainerFactory() {
     var _NULL_CONTENTS = {};
     var _SUBCLASS_COUNTED_LOCKABLE_CONTAINER = [
         'CountedLockableContainer',
-        'ResetableCountedLockableContainer',
+        'ResettableCountedLockableContainer',
         'ResettingCountedLockableContainer'
     ];
 
@@ -30,9 +30,7 @@ function LockableContainerFactory() {
     };
 
     function _lockableContainer() {
-        var args = arguments[0];
-        var lockableContainer = 
-                new LockableContainer(args[1], args[2], args[3]);
+        var lockableContainer = new LockableContainer(arguments[0][1]);
         return {
             isLocked: lockableContainer.isLocked.bind(lockableContainer),
             lock: lockableContainer.lock.bind(lockableContainer),
@@ -44,18 +42,14 @@ function LockableContainerFactory() {
         };
     };
 
-    function _initReadonlys(callback, errback, key) {
-        this._CALLBACK = callback;
-        this._ERRBACK = errback;
-        this._KEY = key;
-    };
+    function _initReadonlys(key) { this._KEY = key; };
 
     function _hasNoContents() { return this._contents === _NULL_CONTENTS; };
 
     function _putContents(contents) { this._contents = contents; };
 
-    function _takeContents() {
-        this._CALLBACK(this._contents);
+    function _takeContents(callback) {
+        callback(this._contents);
         _clearContents.call(this);
     };
 
@@ -65,8 +59,8 @@ function LockableContainerFactory() {
     LockableContainer.prototype = Object.create(Object.prototype);
     LockableContainer.prototype.constructor = LockableContainer;
 
-    LockableContainer.prototype.initialize = function(callback, errback, key) {
-        _initReadonlys.call(this, callback, errback, key);
+    LockableContainer.prototype.initialize = function(key) {
+        _initReadonlys.call(this, key);
         this._initCaches();
     };
 
@@ -74,21 +68,20 @@ function LockableContainerFactory() {
 
     LockableContainer.prototype.lock = function() { this._isLocked = true; };
 
-    LockableContainer.prototype.tryPutContents = function(contents) {
-        if (this.isLocked()) return this._ERRBACK(_MSG_LOCKED);
+    LockableContainer.prototype.tryPutContents = function(contents, errback) {
+        if (this.isLocked()) return errback(_MSG_LOCKED);
         if (_hasNoContents.call(this)) return _putContents.call(this, contents);
-        this._ERRBACK(_MSG_HAS_CONTENTS);
+        errback(_MSG_HAS_CONTENTS);
     };
 
-    LockableContainer.prototype.tryTakeContents = function() {
-        if (this.isLocked()) return this._ERRBACK(_MSG_LOCKED);
-        if (_hasNoContents.call(this)) return this._ERRBACK(_MSG_NO_CONTENTS);
-        _takeContents.call(this);
+    LockableContainer.prototype.tryTakeContents = function(callback, errback) {
+        if (this.isLocked()) return errback(_MSG_LOCKED);
+        if (_hasNoContents.call(this)) return errback(_MSG_NO_CONTENTS);
+        _takeContents.call(this, callback);
     };
 
-    LockableContainer.prototype.tryUnlock = function(key) {
-        if (this._isCorrectKey(key)) return this._unlock();
-        this._ERRBACK(_MSG_INCORRECT_KEY);
+    LockableContainer.prototype.tryUnlock = function(key, errback) {
+        this._isCorrectKey(key) ? this._unlock() : errback(_MSG_INCORRECT_KEY);
     };
 
     LockableContainer.prototype._initCaches = function() {
