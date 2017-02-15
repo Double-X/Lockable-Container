@@ -17,16 +17,16 @@ function CountedLockableContainer() { this.initialize.apply(this, arguments); };
     CountedLockableContainer.prototype.constructor = CountedLockableContainer;
 
     CountedLockableContainer.prototype.initialize = 
-            function(callback, errback, key, maxKeyMismatchCount) {
-        Parent.initialize.call(this, callback, errback, key);
+            function(key, maxKeyMismatchCount) {
+        Parent.initialize.call(this, key);
         this._MAX_KEY_MISMATCH_COUNT = maxKeyMismatchCount;
     };
 
-    CountedLockableContainer.prototype.tryUnlock = function(key) {
+    CountedLockableContainer.prototype.tryUnlock = function(key, errback) {
         if (_hasReachedMaxKeyMismatchCount.call(this)) {
-            return this._ERRBACK(_MSG_MAX_COUNT_REACHED);
+            return errback(_MSG_MAX_COUNT_REACHED);
         }
-        this._tryUnlock(key);
+        this._tryUnlock(key, errback);
     };
 
     CountedLockableContainer.prototype.keyMismatchCount = function() {
@@ -38,11 +38,11 @@ function CountedLockableContainer() { this.initialize.apply(this, arguments); };
         this._resetKeyMismatchCount();
     };
 
-    CountedLockableContainer.prototype._tryUnlock = function(key) {
+    CountedLockableContainer.prototype._tryUnlock = function(key, errback) {
         if (!this._isCorrectKey(key)) _addKeyMismatchCount.call(this);
-        Parent.tryUnlock.call(this, key);
+        Parent.tryUnlock.call(this, key, errback);
         if (!_hasReachedMaxKeyMismatchCount.call(this)) return;
-        this._ERRBACK(_MSG_MAX_COUNT_REACHED);
+        errback(_MSG_MAX_COUNT_REACHED);
     };
 
     CountedLockableContainer.prototype._resetKeyMismatchCount = function() {
