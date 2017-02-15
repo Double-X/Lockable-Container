@@ -1,14 +1,12 @@
-function UnprotectedLockableContainerClass(
-        lockableContainer, CALLBACK, ERRBACK, KEY) {
+function UnprotectedLockableContainerClass(lockableContainer, KEY) {
 
     'use strict';
 
-    var _protected = LockableContainerClass.call(
-            lockableContainer, CALLBACK, ERRBACK, KEY);
+    var _protected = LockableContainerClass.call(lockableContainer, KEY);
 
     function editProtected(protectedProp) {
     	var originalProtected = _protected[protectedProp];
-    	if (!(originalProtected instanceof Function)) return;
+    	if (typeof originalProtected !== 'function') return;
     	_protected[protectedProp] = function() {
     		console.info('UnprotectedLockableContainerClass editProtected');
     		console.info('protectedProp: ' + protectedProp);
