@@ -3,7 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package doublex.lib.locks;
+package doublex.lib.locks.lock;
+
+import doublex.lib.locks.IMutableLockable;
+import doublex.lib.locks.exceptions.KeyMismatchException;
 
 /**
  *
@@ -19,7 +22,8 @@ public class SyncMutableLock<K> implements IMutableLockable<K> {
     }
 
     @Override
-    public synchronized void tryChangeKey(K oldKey, K newKey) {
+    public synchronized void tryChangeKey(final K oldKey, final K newKey) 
+            throws KeyMismatchException {
         mMutableLock.tryChangeKey(oldKey, newKey);
     }
 
@@ -34,7 +38,7 @@ public class SyncMutableLock<K> implements IMutableLockable<K> {
     }
 
     @Override
-    public void tryUnlock(K key) {
+    public synchronized void tryUnlock(K key) throws KeyMismatchException {
         mMutableLock.tryUnlock(key);
     }
 
