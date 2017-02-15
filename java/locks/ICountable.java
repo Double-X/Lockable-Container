@@ -5,6 +5,8 @@
  */
 package doublex.lib.locks;
 
+import doublex.lib.locks.exceptions.ResetCountFailException;
+
 /**
  *
  * @author DoubleX
@@ -13,7 +15,8 @@ public interface ICountable {
 
     public int count();
 
-    public void tryChangeMaxCount(final int maxCount);
+    public void tryChangeMaxCount(final int maxCount) 
+            throws ResetCountFailException;
 
     public void tryResetCount();
 
