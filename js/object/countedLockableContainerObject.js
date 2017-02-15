@@ -30,7 +30,7 @@ function CountedLockableContainerObject() {
 
     function _countedLockableContainer() {
         var args = arguments[0];
-        _PARENT._init(args[1], args[2], args[3], args[4]);
+        _PARENT._init(args[1], args[2]);
         return {
             isLocked: _PARENT.isLocked.bind(_PARENT),
             lock: _PARENT.lock.bind(_PARENT),
@@ -45,28 +45,31 @@ function CountedLockableContainerObject() {
 
     var _keyMismatchCount = 0;
 
-    function _addKeyMismatchCount() { _keyMismatchCount++; };
-
     function _hasReachedMaxKeyMismatchCount() {
         return _PARENT.keyMismatchCount() >= MAX_KEY_MISMATCH_COUNT;
     };
 
+    function _tryUnlock(key, errback) {
+        if (!_PARENT._isCorrectKey(key)) _addKeyMismatchCount.call(_PARENT);
+        originalTryUnlock.call(_PARENT, key, errback);
+        if (!_hasReachedMaxKeyMismatchCount.call(_PARENT)) return;
+        errback(_MSG_MAX_COUNT_REACHED);
+    };
+
+    function _addKeyMismatchCount() { _keyMismatchCount++; };
+
     var _originalInit = _PARENT._init;
-    _PARENT._init = 
-            function(callback, errback, key, maxKeyMismatchCount) {
-        _originalInit.call(_PARENT, callback, errback, key);
+    _PARENT._init = function(key, maxKeyMismatchCount) {
+        _originalInit.call(_PARENT, key);
         MAX_KEY_MISMATCH_COUNT = maxKeyMismatchCount;
     };
 
     var originalTryUnlock = _PARENT.tryUnlock;
-    _PARENT.tryUnlock = function(key) {
+    _PARENT.tryUnlock = function(key, errback) {
         if (_hasReachedMaxKeyMismatchCount.call(_PARENT)) {
-            return _PARENT._ERRBACK(_MSG_MAX_COUNT_REACHED);
+            return errback(_MSG_MAX_COUNT_REACHED);
         }
-        if (!_PARENT._isCorrectKey(key)) _addKeyMismatchCount.call(_PARENT);
-        originalTryUnlock.call(_PARENT, key);
-        if (!_hasReachedMaxKeyMismatchCount.call(_PARENT)) return;
-        _PARENT._ERRBACK(_MSG_MAX_COUNT_REACHED);
+        _tryUnlock(key, errback);
     };
 
     _PARENT.keyMismatchCount = function() { return _keyMismatchCount; };
@@ -83,4 +86,4 @@ function CountedLockableContainerObject() {
 
     return _directSubclassFactoryFunc(arguments[0][0])(arguments[0]);
 
-};        
+};
