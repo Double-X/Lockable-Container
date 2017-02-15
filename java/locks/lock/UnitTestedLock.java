@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package doublex.lib.locks;
+package doublex.lib.locks.lock;
 
+import doublex.lib.locks.ILockable;
+import doublex.lib.locks.exceptions.KeyMismatchException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,7 +39,7 @@ public class UnitTestedLock<K> implements ILockable<K> {
     }
 
     @Override
-    public final void tryUnlock(final K key) {
+    public final void tryUnlock(final K key) throws KeyMismatchException {
         unitTestTryUnlock(key);
         mLock.tryUnlock(key);
     }
