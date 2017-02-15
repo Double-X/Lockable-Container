@@ -5,6 +5,8 @@
  */
 package doublex.lib.locks;
 
+import doublex.lib.locks.exceptions.KeyMismatchException;
+
 /**
  *
  * @author DoubleX
@@ -16,6 +18,6 @@ public interface ILockable<K> {
 
     void lock();
 
-    void tryUnlock(final K key);
+    void tryUnlock(final K key) throws KeyMismatchException;
 
 };
