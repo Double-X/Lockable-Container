@@ -12,7 +12,7 @@ package doublex.lib.lockableContainers;
  */
 public interface IContainable<C> {
 
-    void tryPutContents(final C contents);
+    void tryPutContents(final C contents) throws ContainerFullException;
 
     C triedTakenContents();
 
