@@ -1,4 +1,4 @@
-function LockableContainerUnitTest(lockableContainer, constructor) {
+function LockableContainerUnitTest(lockableContainer) {
 
     'use strict';
 
