@@ -1,10 +1,9 @@
-function ResettingCountedLockableContainerClass(
-        CALLBACK, ERRBACK, KEY, MAX_KEY_MISMATCH_COUNT) {
+function ResettingCountedLockableContainerClass(KEY, MAX_KEY_MISMATCH_COUNT) {
 
     'use strict';
 
     var _protected = CountedLockableContainerClass.call(
-            this, CALLBACK, ERRBACK, KEY, MAX_KEY_MISMATCH_COUNT);
+            this, KEY, MAX_KEY_MISMATCH_COUNT);
 
     function _resetKeyMismatchCount() { _protected.keyMismatchCount = 0; };
 
