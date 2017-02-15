@@ -5,9 +5,8 @@ function ResettableCountedLockableContainerObject() {
     var _PARENT = arguments[0][arguments[0].length];
     var _MSG_LOCKED = 'This container is locked';
 
-    function _resettableCountedLockableContainer(
-            callback, errback, key, maxKeyMismatchCount) {
-        _PARENT._init(callback, errback, key, maxKeyMismatchCount);
+    function _resettableCountedLockableContainer(key, maxKeyMismatchCount) {
+        _PARENT._init(key, maxKeyMismatchCount);
         return {
             isLocked: _PARENT.isLocked.bind(_PARENT),
             lock: _PARENT.lock.bind(_PARENT),
@@ -20,12 +19,12 @@ function ResettableCountedLockableContainerObject() {
         };
     };
 
-    _PARENT.tryResetKeyMismatchCount = function() {
-        if (_PARENT.isLocked()) return _PARENT._ERRBACK(_MSG_LOCKED);
+    _PARENT.tryResetKeyMismatchCount = function(errback) {
+        if (_PARENT.isLocked()) return errback(_MSG_LOCKED);
         _PARENT._resetKeyMismatchCount();
     };
 
     return _resettableCountedLockableContainer(
-            arguments[0][1], arguments[0][2], arguments[0][3], arguments[0][4]);
+            arguments[0][1], arguments[0][2]);
 
-};        
+};
