@@ -19,12 +19,13 @@ public final class SyncLockableContainer<C> implements IContainable<C> {
     }
 
     @Override
-    public final synchronized void tryPutContents(final C contents) {
+    public synchronized void tryPutContents(final C contents) 
+            throws ContainerFullException {
         mContainable.tryPutContents(contents);
     }
 
     @Override
-    public final synchronized C triedTakenContents() {
+    public synchronized C triedTakenContents() {
         return mContainable.triedTakenContents();
     }
 
