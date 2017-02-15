@@ -3,7 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package doublex.lib.locks;
+package doublex.lib.locks.lock;
+
+import doublex.lib.locks.ICountable;
+import doublex.lib.locks.ILockable;
+import doublex.lib.locks.exceptions.KeyMismatchException;
+import doublex.lib.locks.exceptions.MaxKeyMismatchCountReachedException;
+import doublex.lib.locks.exceptions.ResetCountFailException;
 
 /**
  *
@@ -14,8 +20,7 @@ public final class CountedLock<K> implements ICountable, ILockable<K> {
 
     private final ILockable<K> mLock;
 
-    private int mKeyMismatchCount;
-    private int mMaxKeyMismatchCount;
+    private int mKeyMismatchCount, mMaxKeyMismatchCount;
 
     public CountedLock(final int maxKeyMismatchCount, final ILockable<K> lock) {
         resetKeyMismatchCount();
@@ -34,13 +39,12 @@ public final class CountedLock<K> implements ICountable, ILockable<K> {
     }
 
     @Override
-    public void tryUnlock(final K key) {
-        if (isReachMaxKeyMismatchCount()) {
-            return;
-        }
+    public void tryUnlock(final K key) throws KeyMismatchException {
+        checkIsReachMaxKeyMismatchCount();
         mLock.tryUnlock(key);
         if (isLocked()) {
             addKeyMismatchCount();
+            checkIsReachMaxKeyMismatchCount();
         }
     }
 
@@ -50,16 +54,25 @@ public final class CountedLock<K> implements ICountable, ILockable<K> {
     }
 
     @Override
-    public void tryChangeMaxCount(final int maxCount) {
-        if (canChangeMaxCount(maxCount)) {
+    public void tryChangeMaxCount(final int maxCount) 
+            throws ResetCountFailException {
+        if (!isLocked()) {
+            checkCanChangeMaxCount(maxCount);
             changeMaxKeyMismatchCount(maxCount);
         }
     }
 
     @Override
     public void tryResetCount() {
-        if (!isLocked()) {
+        if (!isLocked())  {
             resetKeyMismatchCount();
+        }
+    }
+
+    private void checkIsReachMaxKeyMismatchCount() throws KeyMismatchException {
+        if (isReachMaxKeyMismatchCount()) {
+            throw new KeyMismatchException(
+                    new MaxKeyMismatchCountReachedException());
         }
     }
 
@@ -71,8 +84,12 @@ public final class CountedLock<K> implements ICountable, ILockable<K> {
         mKeyMismatchCount++;
     }
 
-    private boolean canChangeMaxCount(final int maxCount) {
-        return !isLocked() && isExceedCurKeyMismatchCount(maxCount);
+    private void checkCanChangeMaxCount(final int maxCount) 
+            throws ResetCountFailException {
+        if (isExceedCurKeyMismatchCount(maxCount)) {
+            throw new ResetCountFailException(
+                    new MaxKeyMismatchCountReachedException());
+        }
     }
 
     private boolean isExceedCurKeyMismatchCount(final int maxCount) {
