@@ -5,6 +5,7 @@
  */
 package doublex.lib.locks;
 
+import doublex.lib.locks.lock.NullLock;
 import java.util.AbstractMap;
 
 /**
@@ -23,13 +24,18 @@ public final class Locks<K> implements ILocks<K> {
     }
 
     @Override
-    public ILockable<K> lock(final String key) {
-        return mLocks.containsKey(key) ? mLocks.get(key) : NULL_LOCK;
+    public boolean containsKey(final String key) {
+        return mLocks.containsKey(key);
     }
 
     @Override
     public boolean isLocked() {
         return mLocks.values().stream().anyMatch((lock) -> (lock.isLocked()));
+    }
+
+    @Override
+    public ILockable<K> lock(final String key) {
+        return containsKey(key) ? mLocks.get(key) : NULL_LOCK;
     }
 
     @Override
@@ -45,7 +51,7 @@ public final class Locks<K> implements ILocks<K> {
     }
 
     private boolean canPutLock(final String key, final ILockable<K> lock) {
-        return !mLocks.containsKey(key) && !lock.isLocked();
+        return !containsKey(key) && !lock.isLocked();
     }
 
     private void putLock(final String key, final ILockable<K> lock) {
@@ -53,7 +59,7 @@ public final class Locks<K> implements ILocks<K> {
     }
 
     private boolean canTakeLock(final String key) {
-        return mLocks.containsKey(key) && !mLocks.get(key).isLocked();
+        return containsKey(key) && !lock(key).isLocked();
     }
 
     private ILockable<K> takenLock(final String key) {
