@@ -29,8 +29,9 @@ public final class LockableContainer<C, K> implements IContainable<C>  {
     };
 
     @Override
-    public void tryPutContents(final C contents) {
-        if (canPutContents()) {
+    public void tryPutContents(final C contents) throws ContainerFullException {
+        if (!mLocks.isLocked()) {
+            checkCanPutContents();
             putContents(contents);
         }
     }
@@ -40,8 +41,10 @@ public final class LockableContainer<C, K> implements IContainable<C>  {
         return canTakeContents() ? takenContents() : mNullContents;
     }
 
-    private boolean canPutContents() {
-        return !mLocks.isLocked() && isEmpty();
+    private void checkCanPutContents() throws ContainerFullException {
+        if (!isEmpty()) {
+            throw new ContainerFullException();
+        }
     }
 
     private void putContents(final C contents) {
