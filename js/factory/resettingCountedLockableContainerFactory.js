@@ -4,14 +4,12 @@ function ResettingCountedLockableContainerFactory(Parent) {
 
     function _createdCountedLockableContainer() {
         var args = arguments[0];
-        return _resettingCountedLockableContainer(
-                args[1], args[2], args[3], args[4]);
+        return _resettingCountedLockableContainer(args[1], args[2]);
     };
 
-    function _resettingCountedLockableContainer(callback, errback, key, count) {
+    function _resettingCountedLockableContainer(key, count) {
         var resettingCountedLockableContainer = 
-                new ResettingCountedLockableContainer(
-                callback, errback, key, count);
+                new ResettingCountedLockableContainer(key, count);
         return {
             isLocked: resettingCountedLockableContainer.isLocked.bind(
                     resettingCountedLockableContainer),
