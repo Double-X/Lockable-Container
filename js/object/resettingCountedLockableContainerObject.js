@@ -4,9 +4,8 @@ function ResettingCountedLockableContainerObject() {
 
     var _PARENT = arguments[0][arguments[0].length];
 
-    function _resettingCountedLockableContainer(
-            callback, errback, key, maxKeyMismatchCount) {
-        _PARENT._init(callback, errback, key, maxKeyMismatchCount);
+    function _resettingCountedLockableContainer(key, maxKeyMismatchCount) {
+        _PARENT._init(key, maxKeyMismatchCount);
         return {
             isLocked: _PARENT.isLocked.bind(_PARENT),
             lock: _PARENT.lock.bind(_PARENT),
@@ -23,7 +22,6 @@ function ResettingCountedLockableContainerObject() {
         _PARENT._resetKeyMismatchCount();
     };
 
-    return _resettingCountedLockableContainer(
-            arguments[0][1], arguments[0][2], arguments[0][3], arguments[0][4]);
+    return _resettingCountedLockableContainer(arguments[0][1], arguments[0][2]);
 
-};        
+};
