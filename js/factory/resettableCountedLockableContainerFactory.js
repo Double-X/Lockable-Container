@@ -6,14 +6,12 @@ function ResettableCountedLockableContainerFactory(Parent) {
 
     function _createdCountedLockableContainer() {
         var args = arguments[0];
-        return _resettableCountedLockableContainer(
-                args[1], args[2], args[3], args[4]);
+        return _resettableCountedLockableContainer(args[1], args[2]);
     };
 
-    function _resettableCountedLockableContainer(callback, errback, key, count) {
+    function _resettableCountedLockableContainer(key, count) {
         var resettableCountedLockableContainer = 
-                new ResettableCountedLockableContainer(
-                callback, errback, key, count);
+                new ResettableCountedLockableContainer(key, count);
         return {
             isLocked: resettableCountedLockableContainer.isLocked.bind(
                     resettableCountedLockableContainer),
@@ -44,9 +42,8 @@ function ResettableCountedLockableContainerFactory(Parent) {
             ResettableCountedLockableContainer;
 
     ResettableCountedLockableContainer.prototype.tryResetKeyMismatchCount
-            = function() {
-        if (this.isLocked()) return this._ERRBACK(_MSG_LOCKED);
-        this._resetKeyMismatchCount();
+            = function(errback) {
+        this.isLocked() ? errback(_MSG_LOCKED) : this._resetKeyMismatchCount();
     };
 
     return _createdCountedLockableContainer.bind(this);
