@@ -27,7 +27,7 @@ public final class UnitTestedLockableContainer<C, K> implements IContainable<C> 
     }
 
     @Override
-    public void tryPutContents(final C contents) {
+    public void tryPutContents(final C contents) throws ContainerFullException {
         unitTestTryPutContents(contents);
         mLockableContainer.tryPutContents(contents);
     }
