@@ -12,11 +12,13 @@ package doublex.lib.locks;
  */
 public interface ILocks<K> {
 
-    ILockable<K> lock(final String key);
+    boolean containsKey(final String key);
 
     boolean isLocked();
 
-    void tryPutLock(final String key, final ILockable<K> lock);
+    ILockable<K> lock(final String key);
+
+    void tryPutLock(final String key, final ILockable<K> lock) ;
 
     ILockable<K> triedTakenLock(final String key);
 
