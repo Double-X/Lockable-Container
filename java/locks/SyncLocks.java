@@ -19,23 +19,28 @@ public final class SyncLocks<K> implements ILocks<K> {
     }
 
     @Override
-    public final ILockable<K> lock(final String key) {
-        return mLocks.lock(key);
+    public boolean containsKey(final String key) {
+        return mLocks.containsKey(key);
     }
 
     @Override
-    public final boolean isLocked() {
+    public boolean isLocked() {
         return mLocks.isLocked();
     }
 
     @Override
-    public final synchronized void tryPutLock(
+    public ILockable<K> lock(final String key) {
+        return mLocks.lock(key);
+    }
+
+    @Override
+    public synchronized void tryPutLock(
             final String key, final ILockable<K> lock) {
         mLocks.tryPutLock(key, lock);
     }
 
     @Override
-    public final synchronized ILockable<K> triedTakenLock(final String key) {
+    public synchronized ILockable<K> triedTakenLock(final String key) {
         return mLocks.triedTakenLock(key);
     }
 
