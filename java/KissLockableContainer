@@ -1,0 +1,82 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package doublex.lib.lockableContainers;
+
+import doublex.lib.locks.ILockable;
+import doublex.lib.locks.lock.NullLock;
+import java.util.AbstractMap;
+
+/**
+ *
+ * @author DoubleX
+ * @param <C>
+ * @param <K>
+ */
+public final class KissLockableContainer<C, K> {
+
+    private final C mNullContents;
+
+    private C mContents;
+
+    private final ILockable<K> NULL_LOCK = new NullLock<>();
+
+    private final AbstractMap<String, ILockable<K>> mLocks;
+
+    public KissLockableContainer(final AbstractMap<String, ILockable<K>> locks, 
+            final C contents, final C nullContents) {
+        mLocks = locks;
+        mContents = contents;
+        mNullContents = nullContents;
+    };
+
+    public boolean containsKey(final String key) {
+        return mLocks.containsKey(key);
+    }
+
+    public boolean isLocked() {
+        return mLocks.values().stream().anyMatch((lock) -> (lock.isLocked()));
+    }
+
+    public ILockable<K> lock(final String key) {
+        return containsKey(key) ? mLocks.get(key) : NULL_LOCK;
+    }
+
+    public synchronized void tryPutContents(final C contents) 
+            throws ContainerFullException {
+        if (!isLocked()) {
+            if (mContents != mNullContents) {
+                throw new ContainerFullException();
+            }
+            mContents = contents;
+        }
+    }
+
+    public synchronized void tryPutLock(
+            final String key, final ILockable<K> lock) {
+        if (!containsKey(key) && !lock.isLocked()) {
+            mLocks.put(key, lock);
+        }
+    }
+
+    public synchronized C triedTakenContents() {
+        if (isLocked() || mContents == mNullContents) {
+            return mNullContents;
+        }
+        final C contents = mContents;
+        mContents = mNullContents;
+        return contents;
+    }
+
+    public synchronized ILockable<K> triedTakenLock(final String key) {
+        if (containsKey(key) && !lock(key).isLocked()) {
+            final ILockable<K> lock = lock(key);
+            mLocks.remove(key);
+            return lock;
+        }
+        return NULL_LOCK;
+    }
+
+}
