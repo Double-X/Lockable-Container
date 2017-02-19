@@ -41,10 +41,10 @@ public final class CountedLock<K> implements ICountable, ILockable<K> {
     @Override
     public void tryUnlock(final K key) throws KeyMismatchException {
         checkIsReachMaxKeyMismatchCount();
-        mLock.tryUnlock(key);
-        if (isLocked()) {
-            addKeyMismatchCount();
-            checkIsReachMaxKeyMismatchCount();
+        try {
+            mLock.tryUnlock(key);
+        } catch (final KeyMismatchException keyMismatchException) {
+            onUnlockFail(keyMismatchException);
         }
     }
 
@@ -69,10 +69,25 @@ public final class CountedLock<K> implements ICountable, ILockable<K> {
         }
     }
 
+    private void onUnlockFail(final KeyMismatchException keyMismatchException) 
+            throws KeyMismatchException {
+        addKeyMismatchCount();
+        checkIsReachMaxKeyMismatchCount(keyMismatchException);
+        throw new KeyMismatchException(keyMismatchException);
+    }
+
     private void checkIsReachMaxKeyMismatchCount() throws KeyMismatchException {
         if (isReachMaxKeyMismatchCount()) {
             throw new KeyMismatchException(
                     new MaxKeyMismatchCountReachedException());
+        }
+    }
+
+    private void checkIsReachMaxKeyMismatchCount(final KeyMismatchException 
+            keyMismatchException) throws KeyMismatchException {
+        if (isReachMaxKeyMismatchCount()) {
+            throw new KeyMismatchException(new 
+                    MaxKeyMismatchCountReachedException(keyMismatchException));
         }
     }
 
